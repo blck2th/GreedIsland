@@ -3,126 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vinita's Roti - Overkill Ramen Shop</title>
+  <title>Three.js Simple Flower</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-
 <script>
-// Set up basic Three.js scene
+// Basic setup
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Lighting setup - ambient and extreme effects
-const ambientLight = new THREE.AmbientLight(0x404040, 0.7); // Soft ambient light
-scene.add(ambientLight);
+// Flower center
+const centerGeometry = new THREE.SphereGeometry(1, 32, 32);
+const centerMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }); // Yellow
+const center = new THREE.Mesh(centerGeometry, centerMaterial);
+scene.add(center);
 
-const pointLight = new THREE.PointLight(0xFFFFFF, 3, 100);
-pointLight.position.set(10, 20, 10);
-scene.add(pointLight);
+// Petal geometry
+const petalGeometry = new THREE.ConeGeometry(0.5, 2, 32);
+const petalMaterial = new THREE.MeshBasicMaterial({ color: 0xff69b4 }); // Pink
 
-const spotLight = new THREE.SpotLight(0xff0000, 1, 100, Math.PI / 4, 1, 1);
-spotLight.position.set(0, 20, -10);
-scene.add(spotLight);
-
-// Shop structure with polished futuristic surfaces
-const shopGeometry = new THREE.BoxGeometry(30, 15, 30);
-const shopMaterial = new THREE.MeshPhongMaterial({
-  color: 0xeeeeee, // Bright white for a clean, modern look
-  emissive: 0x0a7b79, // Subtle neon blue glow on edges
-  shininess: 150
-});
-const shop = new THREE.Mesh(shopGeometry, shopMaterial);
-scene.add(shop);
-
-// Neon glowing text for the ramen shop name with extra glow
-const fontLoader = new THREE.FontLoader();
-fontLoader.load(
-  'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',
-  function (font) {
-    const textGeometry = new THREE.TextGeometry("Vinita's Roti", {
-      font: font,
-      size: 3,
-      height: 0.5,
-      bevelEnabled: true,
-      bevelThickness: 0.15,
-      bevelSize: 0.25,
-      bevelOffset: 0,
-      bevelSegments: 5
-    });
-
-    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xFF6347, emissive: 0xFF1493 });
-    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-    textMesh.position.set(-12, 8, 15); // Position the text in front of the shop with dynamic glow
-    scene.add(textMesh);
-  },
-  undefined, 
-  function (error) {
-    console.error('Error loading font:', error);
-  }
-);
-
-// Overkill decorative elements - floating ramen bowl and intricate lighting
-const ramenBowlGeometry = new THREE.CylinderGeometry(2, 2, 0.5, 32);
-const ramenBowlMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513, emissive: 0xffa500 });
-const ramenBowl = new THREE.Mesh(ramenBowlGeometry, ramenBowlMaterial);
-ramenBowl.position.set(0, 4, -10); // Positioning ramen bowl in the air as a floating centerpiece
-scene.add(ramenBowl);
-
-// Adding a chandelier with a mix of materials for luxury effect
-const chandelierGeometry = new THREE.SphereGeometry(5, 32, 32);
-const chandelierMaterial = new THREE.MeshPhongMaterial({
-  color: 0xFFD700, // Golden glow for luxury
-  emissive: 0xF4A300, // Glowing orange for the chandelier
-  shininess: 200
-});
-const chandelier = new THREE.Mesh(chandelierGeometry, chandelierMaterial);
-chandelier.position.set(0, 20, 0);
-scene.add(chandelier);
-
-// Over-the-top floor design with glowing patterns and reflections
-const floorGeometry = new THREE.PlaneGeometry(60, 60);
-const floorMaterial = new THREE.MeshPhongMaterial({
-  color: 0x222222,
-  emissive: 0x0000FF,
-  shininess: 250
-});
-const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-floor.rotation.x = - Math.PI / 2;
-floor.position.y = -5;
-scene.add(floor);
-
-// Set up the camera position for an immersive experience
-camera.position.z = 40;
-
-// Handle window resizing
-window.addEventListener('resize', function() {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-});
-
-// Animation loop to render the scene
-function animate() {
-  requestAnimationFrame(animate);
-
-  // Rotate shop and chandelier for dynamic effect
-  shop.rotation.y += 0.005;
-  chandelier.rotation.x += 0.01;
-  chandelier.rotation.y += 0.01;
-
-  // Glowing floor pattern effect
-  floor.rotation.z += 0.002;
-
-  // Render the scene from the camera's perspective
-  renderer.render(scene, camera);
+// Create petals around the center
+const petalCount = 8;
+for (let i = 0; i < petalCount; i++) {
+  const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+  const angle = (i / petalCount) * Math.PI * 2;
+  petal.position.set(Math.cos(angle) * 2, 0, Math.sin(angle) * 2);
+  petal.rotation.x = Math.PI / 2;
+  petal.lookAt(center.position); // Make the petal face the center
+  scene.add(petal);
 }
 
+// Camera position
+camera.position.z = 8;
+
+// Animation loop
+function animate() {
+  requestAnimationFrame(animate);
+  center.rotation.y += 0.01; // Rotate the center for dynamic effect
+  renderer.render(scene, camera);
+}
 animate();
 </script>
-
 </body>
 </html>
