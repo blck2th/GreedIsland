@@ -3,49 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three.js Simple Flower</title>
+  <title>Sophisticated Three.js Flower</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 <script>
-// Basic setup
+// Scene, Camera, Renderer
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Flower center
-const centerGeometry = new THREE.SphereGeometry(1, 32, 32);
-const centerMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 }); // Yellow
-const center = new THREE.Mesh(centerGeometry, centerMaterial);
-scene.add(center);
+// Add Lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
 
-// Petal geometry
-const petalGeometry = new THREE.ConeGeometry(0.5, 2, 32);
-const petalMaterial = new THREE.MeshBasicMaterial({ color: 0xff69b4 }); // Pink
+const pointLight = new THREE.PointLight(0xff69b4, 1, 50);
+pointLight.position.set(5, 10, 5);
+scene.add(pointLight);
 
-// Create petals around the center
-const petalCount = 8;
+// Create Flower Center
+const centerGeometry = new THREE.SphereGeometry(0.7, 32, 32);
+const centerMaterial = new THREE.MeshPhongMaterial({
+  color: 0xffd700,
+  emissive: 0xffa500,
+  shininess: 100,
+});
+const flowerCenter = new THREE.Mesh(centerGeometry, centerMaterial);
+scene.add(flowerCenter);
+
+// Create Petals
+const petalCount = 12;
+const petalMaterial = new THREE.MeshPhongMaterial({
+  color: 0xff69b4,
+  emissive: 0xff1493,
+  shininess: 150,
+  side: THREE.DoubleSide,
+});
+
 for (let i = 0; i < petalCount; i++) {
+  const petalGeometry = new THREE.ConeGeometry(0.5, 3, 32);
   const petal = new THREE.Mesh(petalGeometry, petalMaterial);
   const angle = (i / petalCount) * Math.PI * 2;
+  
   petal.position.set(Math.cos(angle) * 2, 0, Math.sin(angle) * 2);
-  petal.rotation.x = Math.PI / 2;
-  petal.lookAt(center.position); // Make the petal face the center
+  petal.rotation.x = -Math.PI / 2;
+  petal.rotation.z = angle;
   scene.add(petal);
 }
 
-// Camera position
-camera.position.z = 8;
+// Add Stem
+const stemGeometry = new THREE.CylinderGeometry(0.1, 0.1, 5, 32);
+const stemMaterial = new THREE.MeshPhongMaterial({ color: 0x228b22 });
+const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+stem.position.y = -3;
+scene.add(stem);
 
-// Animation loop
+// Camera Position
+camera.position.z = 10;
+
+// Animation
 function animate() {
   requestAnimationFrame(animate);
-  center.rotation.y += 0.01; // Rotate the center for dynamic effect
+
+  // Rotate the flower slowly
+  flowerCenter.rotation.y += 0.01;
   renderer.render(scene, camera);
 }
 animate();
+
 </script>
 </body>
 </html>
